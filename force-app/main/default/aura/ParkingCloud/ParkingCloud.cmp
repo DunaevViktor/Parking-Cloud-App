@@ -1,0 +1,51 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId"
+                controller="ParkingCloudApexController">
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+    <aura:attribute name="wColumns" type="List"/>
+    <aura:attribute name="sensorList" type="Sensor__c[]"/>
+    <aura:attribute name="filetype" type="List" default="['.csv']" />
+    <aura:attribute name="recordId" type="String" />
+    
+    <lightning:layout class="slds-grid_align-center">
+        <lightning:card class="slds-card slds-size_x-large card-st">
+            <!--Header-->
+            <div class="slds-p-left_small slds-p-right_small">
+                <header class="slds-modal__header slds-theme_shade">
+                    <h2
+                        id="modal-heading-01"
+                        class="slds-text-heading_medium slds-hyphenate"
+                        >
+                        Parking Cloud App
+                    </h2>
+                </header>
+            </div>
+            
+            <br/>
+            <!--Body-->
+            <center><lightning:fileUpload label="Download CSV file"
+                                          name="fileUploader"
+                                          multiple="true"
+                                          accept="{!v.filetype}"
+                                          recordId="{!v.recordId}"
+                                          onuploadfinished="{!c.handleUploadFinished}" />
+            </center>
+            
+            <br/>
+            <lightning:layoutItem padding="around-small">
+                <div class="slds-scrollable" style="width:38.375rem;height:25rem">
+                    <div class="slds-scrollable_y">
+                        <lightning:datatable data="{! v.sensorList }" 
+                                             columns="{! v.wColumns }" 
+                                             keyField="id"
+                                             hideCheckboxColumn="true"
+                                             showRowNumberColumn="true"/>
+                    </div>
+                </div>
+            </lightning:layoutItem>
+            
+        </lightning:card>
+    </lightning:layout>
+    
+</aura:component>
