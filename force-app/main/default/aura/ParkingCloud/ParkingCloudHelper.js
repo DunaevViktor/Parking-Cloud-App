@@ -1,5 +1,6 @@
 ({
     initHelper: function (component) {
+        
         component.set('v.wColumns', [
             {label: 'Sensor ID', fieldName: 'Name', type: 'text', cellAttributes: { alignment: "center" }},
             {label: 'Base Station', fieldName: 'Base_Station__c', type: 'text', cellAttributes: { alignment: "center" }},
@@ -25,6 +26,7 @@
         });
         
         $A.enqueueAction(action);
+        
     },
     
 })

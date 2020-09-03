@@ -208,5 +208,28 @@ public class ParkingCloudApexController {
         return allInfo;
     }
     
+    @AuraEnabled
+    public static String checkProfileAndPermissionSet(){
+        String status = 'NO ACCESS';
+        User curUser= [SELECT Id, Name, Username, ProfileId  FROM User WHERE Username =: UserInfo.getUsername()];
+        Profile pr = [SELECT Id, Name FROM Profile WHERE Id =: curUser.ProfileId];
+        
+        if(pr.Name == 'System Administrator'){
+            status = 'ACCESS';
+        }
+        
+        if(pr.Name == 'MyCustomProfileSF'){
+            List<PermissionSetAssignment> listOfPS = [SELECT Id, PermissionSet.Name, Assignee.Name FROM PermissionSetAssignment
+                                                      WHERE Assignee.Name =: curUser.Name];
+            for(Integer i=0; i<listOfPS.size(); i++){
+                if(listOfPS[i].PermissionSet.Name == 'PermSetForSensorAPI'){
+                    status = 'ACCESS';
+                }
+            }
+        }
+        
+        return status;
+    }
+    
     
 }

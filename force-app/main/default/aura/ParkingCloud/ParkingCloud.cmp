@@ -7,6 +7,8 @@
     <aura:attribute name="sensorList" type="Sensor__c[]"/>
     <aura:attribute name="filetype" type="List" default="['.csv']" />
     <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="displayError" type="Boolean" default="false" />
+    <aura:attribute name="displayBody" type="Boolean" default="true" />
     
     <lightning:layout class="slds-grid_align-center">
         <lightning:card class="slds-card slds-size_x-large card-st">
@@ -24,27 +26,38 @@
             
             <br/>
             <!--Body-->
-            <center><lightning:fileUpload label="Download CSV file"
-                                          name="fileUploader"
-                                          multiple="true"
-                                          accept="{!v.filetype}"
-                                          recordId="{!v.recordId}"
-                                          onuploadfinished="{!c.handleUploadFinished}" />
-            </center>
             
-            <br/>
-            <lightning:layoutItem padding="around-small">
-                <div class="slds-scrollable" style="width:38.375rem;height:25rem">
-                    <div class="slds-scrollable_y">
-                        <lightning:datatable data="{! v.sensorList }" 
-                                             columns="{! v.wColumns }" 
-                                             keyField="id"
-                                             hideCheckboxColumn="true"
-                                             showRowNumberColumn="true"/>
+            <aura:if isTrue="{!v.displayError}">
+                <center>
+                    <lightning:textarea name="errorMessage" value="NO ACCESS" label="Error: "/>
+                </center>
+            </aura:if>
+            
+            <!-- /// -->
+            <aura:if isTrue="{!v.displayBody}">
+                <center><lightning:fileUpload label="Download CSV file"
+                                              name="fileUploader"
+                                              multiple="true"
+                                              accept="{!v.filetype}"
+                                              recordId="{!v.recordId}"
+                                              onuploadfinished="{!c.handleUploadFinished}" />
+                </center>
+                
+                <br/>
+                <lightning:layoutItem padding="around-small">
+                    <div class="slds-scrollable" style="width:38.375rem;height:25rem">
+                        <div class="slds-scrollable_y">
+                            <lightning:datatable data="{! v.sensorList }" 
+                                                 columns="{! v.wColumns }" 
+                                                 keyField="id"
+                                                 hideCheckboxColumn="true"
+                                                 showRowNumberColumn="true"/>
+                        </div>
                     </div>
-                </div>
-            </lightning:layoutItem>
-            
+                </lightning:layoutItem>
+            </aura:if>
+            <!-- /// -->
+                
         </lightning:card>
     </lightning:layout>
     

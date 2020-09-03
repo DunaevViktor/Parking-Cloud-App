@@ -69,4 +69,28 @@
         
     }
     
+    @isTest static void testAdminAccess(){
+        String status = ParkingCloudApexController.checkProfileAndPermissionSet();
+        System.assertEquals('ACCESS', status);
+    }
+    
+    @isTest public static void testRunAsUser() {
+        Profile p = [SELECT Id FROM Profile WHERE Name='MyCustomProfileSF'];
+        
+        User userN = new User(Alias = 'newUser', Email='newuser@testorg.com',
+                              EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US',
+                              LocaleSidKey='en_US', ProfileId = p.Id,
+                              TimeZoneSidKey='America/Los_Angeles', UserName='newuser1337@testorg.com');
+        insert userN;
+        System.runAs(userN) {
+            PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'PermSetForSensorAPI'];
+            insert new PermissionSetAssignment(AssigneeId = userN.Id, PermissionSetId = ps.Id);
+            
+            String currUserName = UserInfo.getUserName();
+            System.assertEquals('newuser1337@testorg.com', currUserName);
+            String status = ParkingCloudApexController.checkProfileAndPermissionSet();
+            System.assertEquals('ACCESS', status);
+        }
+    }
+    
 }

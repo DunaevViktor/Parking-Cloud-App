@@ -1,6 +1,27 @@
 ({
     doInit : function(component, event, helper) {
-        helper.initHelper(component);
+        
+        var action = component.get("c.checkProfileAndPermissionSet");
+        
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                var status = response.getReturnValue();
+                if(status == 'ACCESS'){
+                    helper.initHelper(component);
+                }
+                else{
+                    component.set("v.displayError", true);
+                    component.set("v.displayBody", false);
+                }
+            }
+            else {
+                console.log("Failed with state: " + state);
+            }
+        });
+        
+        $A.enqueueAction(action);
+        
     },
     
     handleUploadFinished: function (component, event, helper) {
@@ -16,5 +37,5 @@
         
         helper.initHelper(component);     
     },
-     
+    
 })
