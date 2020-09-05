@@ -209,26 +209,54 @@ public class ParkingCloudApexController {
     }
     
     @AuraEnabled
-    public static String checkProfileAndPermissionSet(){
+    public static String checkAccessToFiledsAndObjects(){
         String status = 'NO ACCESS';
-        User curUser= [SELECT Id, Name, Username, ProfileId  FROM User WHERE Username =: UserInfo.getUsername()];
-        Profile pr = [SELECT Id, Name FROM Profile WHERE Id =: curUser.ProfileId];
+        Integer count = 0;
         
-        if(pr.Name == 'System Administrator'){
+        //Objects
+        if (Schema.sObjectType.Base_Station__c.isAccessible()
+            && Schema.sObjectType.Base_Station__c.isUpdateable()
+            && Schema.sObjectType.Base_Station__c.isCreateable()) {
+                count ++;
+            }
+        if (Schema.sObjectType.Sensor__c.isAccessible()
+            && Schema.sObjectType.Sensor__c.isUpdateable()
+            && Schema.sObjectType.Sensor__c.isCreateable()) {
+                count ++;
+            }
+        //Fields
+        if (Schema.sObjectType.Base_Station__c.fields.Name.isAccessible()
+            && Schema.sObjectType.Base_Station__c.fields.Name.isUpdateable()
+            && Schema.sObjectType.Base_Station__c.fields.Name.isCreateable()) {
+                count ++;
+            }
+        if (Schema.sObjectType.Sensor__c.fields.Name.isAccessible()
+            && Schema.sObjectType.Sensor__c.fields.Name.isUpdateable()
+            && Schema.sObjectType.Sensor__c.fields.Name.isCreateable()) {
+                count ++;
+            }
+        if (Schema.sObjectType.Sensor__c.fields.Status__c.isAccessible()
+            && Schema.sObjectType.Sensor__c.fields.Status__c.isUpdateable()
+            && Schema.sObjectType.Sensor__c.fields.Status__c.isCreateable()) {
+                count ++;
+            }
+        if (Schema.sObjectType.Sensor__c.fields.Model__c.isAccessible()
+            && Schema.sObjectType.Sensor__c.fields.Model__c.isUpdateable()
+            && Schema.sObjectType.Sensor__c.fields.Model__c.isCreateable()) {
+                count ++;
+            }
+        if (Schema.sObjectType.Sensor__c.fields.Base_Station__c.isAccessible()
+            && Schema.sObjectType.Sensor__c.fields.Base_Station__c.isUpdateable()
+            && Schema.sObjectType.Sensor__c.fields.Base_Station__c.isCreateable()) {
+                count ++;
+            }
+        
+        if(count == 7){
             status = 'ACCESS';
         }
         
-        if(pr.Name == 'MyCustomProfileSF'){
-            List<PermissionSetAssignment> listOfPS = [SELECT Id, PermissionSet.Name, Assignee.Name FROM PermissionSetAssignment
-                                                      WHERE Assignee.Name =: curUser.Name];
-            for(Integer i=0; i<listOfPS.size(); i++){
-                if(listOfPS[i].PermissionSet.Name == 'PermSetForSensorAPI'){
-                    status = 'ACCESS';
-                }
-            }
-        }
-        
         return status;
+        
     }
     
     

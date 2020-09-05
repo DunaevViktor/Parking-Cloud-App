@@ -1,7 +1,7 @@
 ({
     doInit : function(component, event, helper) {
         
-        var action = component.get("c.checkProfileAndPermissionSet");
+        var action = component.get("c.checkAccessToFiledsAndObjects");
         
         action.setCallback(this, function(response) {
             var state = response.getState();

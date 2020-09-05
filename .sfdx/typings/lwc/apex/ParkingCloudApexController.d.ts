@@ -7,6 +7,6 @@ declare module "@salesforce/apex/ParkingCloudApexController.getFileInfo" {
 declare module "@salesforce/apex/ParkingCloudApexController.getStartInfo" {
   export default function getStartInfo(): Promise<any>;
 }
-declare module "@salesforce/apex/ParkingCloudApexController.checkProfileAndPermissionSet" {
-  export default function checkProfileAndPermissionSet(): Promise<any>;
+declare module "@salesforce/apex/ParkingCloudApexController.checkAccessToFiledsAndObjects" {
+  export default function checkAccessToFiledsAndObjects(): Promise<any>;
 }
