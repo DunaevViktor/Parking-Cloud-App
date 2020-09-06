@@ -92,8 +92,8 @@
             PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'PermSetForSensorAPI'];
             insert new PermissionSetAssignment(AssigneeId = userN.Id, PermissionSetId = ps.Id);
             
+            String status = ParkingCloudApexController.checkAccessToFiledsAndObjects();
             //???
-            //String status = ParkingCloudApexController.checkAccessToFiledsAndObjects();
             //System.assertEquals('ACCESS', status);
         }
     }

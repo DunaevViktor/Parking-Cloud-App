@@ -29,7 +29,7 @@
             
             <aura:if isTrue="{!v.displayError}">
                 <center>
-                    <lightning:textarea name="errorMessage" value="NO ACCESS" label="Error: "/>
+                    <b>ERROR: </b> no access, contact the administrator.
                 </center>
             </aura:if>
             

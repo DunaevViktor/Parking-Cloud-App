@@ -210,49 +210,31 @@ public class ParkingCloudApexController {
     
     @AuraEnabled
     public static String checkAccessToFiledsAndObjects(){
-        String status = 'NO ACCESS';
-        Integer count = 0;
+        String status = 'ACCESS';
         
-        //Objects
-        if (Schema.sObjectType.Base_Station__c.isAccessible()
-            && Schema.sObjectType.Base_Station__c.isUpdateable()
-            && Schema.sObjectType.Base_Station__c.isCreateable()) {
-                count ++;
-            }
-        if (Schema.sObjectType.Sensor__c.isAccessible()
-            && Schema.sObjectType.Sensor__c.isUpdateable()
-            && Schema.sObjectType.Sensor__c.isCreateable()) {
-                count ++;
-            }
-        //Fields
-        if (Schema.sObjectType.Base_Station__c.fields.Name.isAccessible()
-            && Schema.sObjectType.Base_Station__c.fields.Name.isUpdateable()
-            && Schema.sObjectType.Base_Station__c.fields.Name.isCreateable()) {
-                count ++;
-            }
-        if (Schema.sObjectType.Sensor__c.fields.Name.isAccessible()
-            && Schema.sObjectType.Sensor__c.fields.Name.isUpdateable()
-            && Schema.sObjectType.Sensor__c.fields.Name.isCreateable()) {
-                count ++;
-            }
-        if (Schema.sObjectType.Sensor__c.fields.Status__c.isAccessible()
-            && Schema.sObjectType.Sensor__c.fields.Status__c.isUpdateable()
-            && Schema.sObjectType.Sensor__c.fields.Status__c.isCreateable()) {
-                count ++;
-            }
-        if (Schema.sObjectType.Sensor__c.fields.Model__c.isAccessible()
-            && Schema.sObjectType.Sensor__c.fields.Model__c.isUpdateable()
-            && Schema.sObjectType.Sensor__c.fields.Model__c.isCreateable()) {
-                count ++;
-            }
-        if (Schema.sObjectType.Sensor__c.fields.Base_Station__c.isAccessible()
-            && Schema.sObjectType.Sensor__c.fields.Base_Station__c.isUpdateable()
-            && Schema.sObjectType.Sensor__c.fields.Base_Station__c.isCreateable()) {
-                count ++;
-            }
+        //Objects, update with exception
+        if(!Schema.sObjectType.Sensor__c.isAccessible()) {
+            status = 'NO ACCESS';
+        }
+        if(!Schema.sObjectType.Base_Station__c.isAccessible()) {
+            status = 'NO ACCESS';
+        }
         
-        if(count == 7){
-            status = 'ACCESS';
+        //Fields, update with exception
+        String[] baseStationFields = new String[] {'Id', 'Name'};
+            Map<String, Schema.SObjectField> mapBS = Schema.SObjectType.Base_Station__c.fields.getMap();
+        for (String fieldToCheck : baseStationFields) {
+            if (!mapBS.get(fieldToCheck).getDescribe().isAccessible()) {
+                status = 'NO ACCESS';
+            }
+        }
+        
+        String[] sensorFields = new String[] {'Id', 'Name', 'Status__c', 'Model__c', 'Base_Station__c'};
+            Map<String, Schema.SObjectField> mapSensorField = Schema.SObjectType.Sensor__c.fields.getMap();
+        for (String fieldToCheck : sensorFields) {
+            if (!mapSensorField.get(fieldToCheck).getDescribe().isAccessible()) {
+                status = 'NO ACCESS';
+            }
         }
         
         return status;
