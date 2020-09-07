@@ -1,6 +1,5 @@
 public class ParkingCloudApexController {
     
-    
     @AuraEnabled
     public static List<String> isCorrectAndNotDuplicate(List<String> dataFromFile){
         List<String> preCorrectList = new List<String>();
@@ -202,30 +201,21 @@ public class ParkingCloudApexController {
     
     @AuraEnabled
     public static List<Sensor__c> getStartInfo(){
-        //Getting data to display
-        List<Sensor__c> allInfo = new List<Sensor__c>();
-        allInfo = [SELECT Name, Base_Station__c, Base_Station__r.Name, Status__c, Model__c FROM Sensor__c];
-        return allInfo;
-    }
-    
-    @AuraEnabled
-    public static String checkAccessToFiledsAndObjects(){
-        String status = 'ACCESS';
         
-        //Objects, update with exception
+        //Checks access to Objects
         if(!Schema.sObjectType.Sensor__c.isAccessible()) {
-            status = 'NO ACCESS';
+            throw new System.NoAccessException();
         }
         if(!Schema.sObjectType.Base_Station__c.isAccessible()) {
-            status = 'NO ACCESS';
+            throw new System.NoAccessException();
         }
         
-        //Fields, update with exception
+        //Checks access to Fields(necessary or all)
         String[] baseStationFields = new String[] {'Id', 'Name'};
             Map<String, Schema.SObjectField> mapBS = Schema.SObjectType.Base_Station__c.fields.getMap();
         for (String fieldToCheck : baseStationFields) {
             if (!mapBS.get(fieldToCheck).getDescribe().isAccessible()) {
-                status = 'NO ACCESS';
+                throw new System.NoAccessException();
             }
         }
         
@@ -233,13 +223,14 @@ public class ParkingCloudApexController {
             Map<String, Schema.SObjectField> mapSensorField = Schema.SObjectType.Sensor__c.fields.getMap();
         for (String fieldToCheck : sensorFields) {
             if (!mapSensorField.get(fieldToCheck).getDescribe().isAccessible()) {
-                status = 'NO ACCESS';
+                throw new System.NoAccessException();
             }
         }
         
-        return status;
-        
+        //Getting data to display
+        List<Sensor__c> allInfo = new List<Sensor__c>();
+        allInfo = [SELECT Name, Base_Station__c, Base_Station__r.Name, Status__c, Model__c FROM Sensor__c];
+        return allInfo;
     }
-    
-    
+      
 }

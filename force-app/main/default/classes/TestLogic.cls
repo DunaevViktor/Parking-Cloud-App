@@ -1,6 +1,7 @@
-@isTest private class TestLogic {
+@isTest private class TestLogic{
     
     @isTest static void testStartInfoFunc() {
+        //test select
         Base_Station__c bs = new Base_Station__c();
         bs.Name = 'Test Base';
         insert bs;
@@ -13,7 +14,62 @@
         insert sensor;
         
         List<Sensor__c> listSensors = ParkingCloudApexController.getStartInfo();
-        System.assertEquals('123abc', listSensors[0].Name); 
+        System.assertEquals('123abc', listSensors[0].Name);
+        
+        //test no access
+        Profile p = [SELECT Id FROM Profile WHERE Name='MyCustomProfileSF'];
+        
+        User userN = new User(Alias = 'newUser', Email='newuser@testorg.com',
+                              EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US',
+                              LocaleSidKey='en_US', ProfileId = p.Id,
+                              TimeZoneSidKey='America/Los_Angeles', UserName='newuser1337@testorg.com');
+        insert userN;
+        
+        System.runAs(userN) {
+            String currUserName = UserInfo.getUserName();
+            System.assertEquals('newuser1337@testorg.com', currUserName);
+            
+            try {
+                List<Sensor__c> sensors = ParkingCloudApexController.getStartInfo();
+            } catch (Exception e) {
+                System.assertEquals('System.NoAccessException', e.getTypeName());
+            }
+        }
+        
+    }
+    
+    @isTest static void testAccessForUser() {
+        
+        Profile p = [SELECT Id FROM Profile WHERE Name='MyCustomProfileSF'];
+        
+        User userN = new User(Alias = 'newUser', Email='newuser@testorg.com',
+                              EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US',
+                              LocaleSidKey='en_US', ProfileId = p.Id,
+                              TimeZoneSidKey='America/Los_Angeles', UserName='newuser1337@testorg.com');
+        insert userN;
+        
+        PermissionSet permission = [SELECT Name FROM PermissionSet WHERE Name = 'PermSetForSensorAPI'];
+        PermissionSetAssignment assignment = new PermissionSetAssignment (PermissionSetId = permission.Id, AssigneeId = userN.Id);
+        
+        insert(assignment);
+        
+        System.runAs(userN) {
+            Base_Station__c bs = new Base_Station__c();
+            bs.Name = 'Test Base';
+            insert bs;
+            
+            
+            Sensor__c sensor = new Sensor__c();
+            sensor.Name = '123abc';
+            sensor.Status__c = 'Works';
+            sensor.Model__c = 'model';
+            sensor.Base_Station__c = bs.Id;
+            insert sensor;
+            
+            List<Sensor__c> sensors1 = ParkingCloudApexController.getStartInfo();
+            System.assertEquals(1, sensors1.size());
+        }
+        
     }
     
     @isTest static void testLogic(){
@@ -67,35 +123,6 @@
         System.assertEquals(2, listS2.size());
         System.assertEquals(3, listB2.size());
         
-    }
-    
-    @isTest static void testAdminAccess(){
-        String status = ParkingCloudApexController.checkAccessToFiledsAndObjects();
-        System.assertEquals('ACCESS', status);
-    }
-    
-    @isTest static void testUserAccess(){
-        Profile p = [SELECT Id FROM Profile WHERE Name='MyCustomProfileSF'];
-        
-        User userN = new User(Alias = 'newUser', Email='newuser@testorg.com',
-                              EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US',
-                              LocaleSidKey='en_US', ProfileId = p.Id,
-                              TimeZoneSidKey='America/Los_Angeles', UserName='newuser1337@testorg.com');
-        insert userN;
-        
-        System.runAs(userN) {
-            String currUserName = UserInfo.getUserName();
-            System.assertEquals('newuser1337@testorg.com', currUserName);
-            String statusWithoutPermSet = ParkingCloudApexController.checkAccessToFiledsAndObjects();
-            System.assertEquals('NO ACCESS', statusWithoutPermSet);
-            
-            PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'PermSetForSensorAPI'];
-            insert new PermissionSetAssignment(AssigneeId = userN.Id, PermissionSetId = ps.Id);
-            
-            String status = ParkingCloudApexController.checkAccessToFiledsAndObjects();
-            //???
-            //System.assertEquals('ACCESS', status);
-        }
     }
     
 }
