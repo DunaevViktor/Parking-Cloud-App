@@ -203,28 +203,38 @@ public class ParkingCloudApexController {
     public static List<Sensor__c> getStartInfo(){
         
         //Checks access to Objects
-        if(!Schema.sObjectType.Sensor__c.isAccessible()) {
-            throw new System.NoAccessException();
-        }
-        if(!Schema.sObjectType.Base_Station__c.isAccessible()) {
-            throw new System.NoAccessException();
-        }
+        if(!Schema.sObjectType.Sensor__c.isAccessible() ||
+           !Schema.sObjectType.Sensor__c.isCreateable() ||
+           !Schema.sObjectType.Sensor__c.isUpdateable() ||
+           !Schema.sObjectType.Sensor__c.isDeletable()) {
+               throw new System.NoAccessException();
+           }
+        if(!Schema.sObjectType.Base_Station__c.isAccessible() ||
+           !Schema.sObjectType.Base_Station__c.isCreateable() ||
+           !Schema.sObjectType.Base_Station__c.isUpdateable() ||
+           !Schema.sObjectType.Base_Station__c.isDeletable()) {
+               throw new System.NoAccessException();
+           }
         
-        //Checks access to Fields(necessary or all)
-        String[] baseStationFields = new String[] {'Id', 'Name'};
+        //Checks access to necessary Fields
+        String[] baseStationFields = new String[] {'Name'};
             Map<String, Schema.SObjectField> mapBS = Schema.SObjectType.Base_Station__c.fields.getMap();
         for (String fieldToCheck : baseStationFields) {
-            if (!mapBS.get(fieldToCheck).getDescribe().isAccessible()) {
-                throw new System.NoAccessException();
-            }
+            if (!mapBS.get(fieldToCheck).getDescribe().isAccessible()||
+                !mapBS.get(fieldToCheck).getDescribe().isCreateable()||
+                !mapBS.get(fieldToCheck).getDescribe().isUpdateable()) {
+                    throw new System.NoAccessException();
+                }
         }
         
-        String[] sensorFields = new String[] {'Id', 'Name', 'Status__c', 'Model__c', 'Base_Station__c'};
+        String[] sensorFields = new String[] {'Name', 'Status__c', 'Model__c', 'Base_Station__c'};
             Map<String, Schema.SObjectField> mapSensorField = Schema.SObjectType.Sensor__c.fields.getMap();
         for (String fieldToCheck : sensorFields) {
-            if (!mapSensorField.get(fieldToCheck).getDescribe().isAccessible()) {
-                throw new System.NoAccessException();
-            }
+            if (!mapSensorField.get(fieldToCheck).getDescribe().isAccessible()||
+                !mapSensorField.get(fieldToCheck).getDescribe().isCreateable()||
+                !mapSensorField.get(fieldToCheck).getDescribe().isUpdateable()) {
+                    throw new System.NoAccessException();
+                }
         }
         
         //Getting data to display
@@ -232,5 +242,5 @@ public class ParkingCloudApexController {
         allInfo = [SELECT Name, Base_Station__c, Base_Station__r.Name, Status__c, Model__c FROM Sensor__c];
         return allInfo;
     }
-      
+    
 }
