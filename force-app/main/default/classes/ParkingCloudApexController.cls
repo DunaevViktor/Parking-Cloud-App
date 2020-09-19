@@ -202,27 +202,21 @@ public class ParkingCloudApexController {
     @AuraEnabled
     public static List<Sensor__c> getStartInfo(){
         
+        //isCreateable / isUpdateable / isDeletable checks for only special cases
         //Checks access to Objects
-        if(!Schema.sObjectType.Sensor__c.isAccessible() ||
-           !Schema.sObjectType.Sensor__c.isCreateable() ||
-           !Schema.sObjectType.Sensor__c.isUpdateable() ||
-           !Schema.sObjectType.Sensor__c.isDeletable()) {
+        if(!Schema.sObjectType.Sensor__c.isAccessible()) {
                throw new System.NoAccessException();
            }
-        if(!Schema.sObjectType.Base_Station__c.isAccessible() ||
-           !Schema.sObjectType.Base_Station__c.isCreateable() ||
-           !Schema.sObjectType.Base_Station__c.isUpdateable() ||
-           !Schema.sObjectType.Base_Station__c.isDeletable()) {
+        if(!Schema.sObjectType.Base_Station__c.isAccessible()) {
                throw new System.NoAccessException();
            }
         
+        //isCreateable / isUpdateable checks are performed directly in create / delete functions
         //Checks access to necessary Fields
         String[] baseStationFields = new String[] {'Name'};
             Map<String, Schema.SObjectField> mapBS = Schema.SObjectType.Base_Station__c.fields.getMap();
         for (String fieldToCheck : baseStationFields) {
-            if (!mapBS.get(fieldToCheck).getDescribe().isAccessible()||
-                !mapBS.get(fieldToCheck).getDescribe().isCreateable()||
-                !mapBS.get(fieldToCheck).getDescribe().isUpdateable()) {
+            if (!mapBS.get(fieldToCheck).getDescribe().isAccessible()) {
                     throw new System.NoAccessException();
                 }
         }
@@ -230,9 +224,7 @@ public class ParkingCloudApexController {
         String[] sensorFields = new String[] {'Name', 'Status__c', 'Model__c', 'Base_Station__c'};
             Map<String, Schema.SObjectField> mapSensorField = Schema.SObjectType.Sensor__c.fields.getMap();
         for (String fieldToCheck : sensorFields) {
-            if (!mapSensorField.get(fieldToCheck).getDescribe().isAccessible()||
-                !mapSensorField.get(fieldToCheck).getDescribe().isCreateable()||
-                !mapSensorField.get(fieldToCheck).getDescribe().isUpdateable()) {
+            if (!mapSensorField.get(fieldToCheck).getDescribe().isAccessible()) {
                     throw new System.NoAccessException();
                 }
         }
